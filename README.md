@@ -1,83 +1,29 @@
 # Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection
 
-# Experimentally Defined Convolutional Neural Network Architecture Variants for Non-temporal Real-time Fire Detection
-
-[and subsequent follow on work: _Experimental Exploration of Compact Convolutional Neural Network Architectures
-for Non-temporal Real-time Fire Detection_]
-
-![Python Build/Test](https://github.com/tobybreckon/fire-detection-cnn/workflows/Python%20Build/Test/badge.svg) Tested using Python 3.7.x, [TensorFlow 1.15](https://www.tensorflow.org/install/), [TFLearn 0.3.2](http://tflearn.org/) and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation)
+![Python Build/Test](https://github.com/tobybreckon/fire-detection-cnn/workflows/Python%20Build/Test/badge.svg) Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation)
 
 ## Architectures:
-![FireNet](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/FireNet.png)
+![FiNasNet-A-OnFire](https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/tree/main/images/nasnetonfire.png)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FireNet architecture (above)
-![InceptionV1-onFire](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/InceptionV1-OnFire.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NasNet-A-OnFire architecture (above)
+![ShuffleNetV2-OnFire](https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/tree/main/images/shuffleneronfire.png)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InceptionV1-OnFire architecture (above)
-![InceptionV3-onFire](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/InceptionV3-OnFire.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InceptionV3-OnFire architecture (above)
-![InceptionV4-onFire](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/InceptionV4-OnFire.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InceptionV4-OnFire architecture (above)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ShuffleNetV2-OnFire architecture (above)
 
 ## Abstract:
 
-_"In  this  work  we  investigate  the  automatic  detection  of  fire pixel  regions  in  video  (or  still)  imagery  within  real-time
-bounds without reliance on temporal scene information.  As an extension to prior work in the field, we consider the performance  of  experimentally  defined,  reduced  complexity  deep convolutional neural network (CNN) architectures for this task. Contrary to contemporary trends in the field, our work illustrates
-maximal accuracy of 0.93 for whole image binary fire detection (1),  with  0.89  accuracy  within  our  superpixel  localization
-framework  can  be  achieved (2),  via  a  network  architecture  of significantly reduced complexity. These reduced architectures
-additionally  offer  a  3-4  fold  increase  in  computational  performance offering up to 17 fps processing on contemporary
-hardware  independent  of  temporal  information (1).    We  show the  relative  performance  achieved  against  prior  work  using
-benchmark datasets to illustrate maximally robust real-time fire region detection."_
+_"—Automatic visual fire detection is used to complement traditional fire detection sensor systems (smoke/heat). In this work, we investigate different Convolutional Neural Network (CNN) architectures and their variants for the nontemporal real-time bounds detection of fire pixel regions in video (or still) imagery. Two reduced complexity compact CNN architectures (NasNet-A-OnFire and ShuffleNetV2-OnFire) are proposed through experimental analysis to optimise the computational efficiency for this task. The results improve upon the current state-of-the-art solution for fire detection, achieving an accuracy of 95% for full-frame binary classification and 97% for superpixel localisation. We notably achieve a classification speed up by a factor of 2.3× for binary classification and 1.3× for superpixel localisation, with runtime of 40 fps and 18 fps respectively, outperforming prior work in the field presenting an efficient, robust and real-time solution for fire region detection. Subsequent implementation on low-powered devices (Nvidia Xavier-NX, achieving 49 fps for full-frame classification via ShuffleNetV2-OnFire) demonstrates our architectures are suitable for various real-world deployment applications."_
 
-(1) using InceptionV1-OnFire CNN model (2) using SP-InceptionV1-OnFire CNN model
-
-[[Dunnings, Breckon, In Proc. International Conference on Image Processing, IEEE, 2018](https://breckon.org/toby/publications/papers/dunnings18fire.pdf)]
-
-_".... Contrary to contemporary trends in the field, our work illustrates a   maximum   overall   accuracy   of   0.96   for   full   frame   binary fire   detection (3)   and   0.94   for   superpixel   localization (4)  using   an experimentally  defined  reduced  CNN  architecture  based  on  the concept of InceptionV4. We notably achieve a lower false positive rate  of  0.06  compared  to  prior  work  in  the  field  presenting  an efficient, robust and real-time solution for fire region detection."_
-
-(3) using InceptionV4-OnFire CNN model (4) using SP-InceptionV4-OnFire CNN model
-
-[[Samarth, Bhowmik, Breckon, In Proc. International Conference on Machine Learning Applications, IEEE, 2019](https://breckon.org/toby/publications/papers/samarth19fire.pdf)]
+[[Thomson, Bhowmik, Breckon, In Proc. International Conference on Machine Learning Applications, IEEE, 2020](https://breckon.org/toby/publications/papers/thompson20fire.pdf)]
 
 ---
 
-## Reference implementation:
-Put simply, our full-frame binary detection (_FireNet, InceptionV1-OnFire, InceptionV3-OnFire, InceptionV4-OnFire_) architectures determine whether an image frame contains fire globally, whereas the superpixel based approaches (_SP-InceptionV1-OnFire, SP-InceptionV3-OnFire, SP-InceptionV4-OnFire_) breaks down the frame into segments and performs classification on each superpixel segment to provide in-frame localization.
-
-This respository contains the ```firenet.py``` and ```inceptionVxOnFire.py``` files corresponding to the binary (full-frame) detection models from the paper(s). In addition the ```superpixel-inceptionVxOnFire.py``` file corresponds to the superpixel based in-frame fire localization from the paper(s).
-
- To use these scripts the pre-trained network models must be downloaded using the shell script ```download-models.sh``` which will create an additional ```models``` directory containing the network weight data (on Linux/MacOS). Alternatively, you can manually download the pre-trained network models from [http://dx.doi.org/10.15128/r19880vq98m](http://dx.doi.org/10.15128/r19880vq98m) [Dunnings, 2018] + [http://doi.org/10.15128/r25x21tf409](http://doi.org/10.15128/r25x21tf409) [Samarth, 2019] and unzip them to a directory called  ```models``` in the same place as the python files.
-
-The superpixel based approach was trained to perform superpixel based fire detection and localization within a given frame as follows:
-  * image frame is split into segments using SLIC superpixel segmentation
-  * a _SP-InceptionVx-OnFire_ convolutional architecture (for _x = 1, 3, 4 for InceptionV1, InceptionV3, InceptionV4_), trained to detect fire in a given superpixel segment, is used on each superpixel.
-  * at run-time (inference), the selected _SP-InceptionVx-OnFire_, network is run on every superpixel from the SLIC segmentation of the image
-
-#### _Which model should I use ?_
-
-For the **best detection performance (i.e. high true positive rate, low false positive rate) use _InceptionV4-OnFire_** (example: ```inceptionVxOnFire.py -m 4```) which operates at 12 frames per second (fps), for **best throughtput (17 fps) use _FireNet_** (example: ```firenet.py```) which has slightly lesser performance (i.e. lower true positive rate, higher false positive rate).
-
-The _InceptionV1-OnFire_ and _InceptionV3-OnFire_ offer alternative performance characteristics in terms of detection, false alarm and throughput - (example: ```inceptionVxOnFire.py -m 1``` or ```inceptionVxOnFire.py -m 3```).
-
-The **_SP-InceptionV4-OnFire_ model offers the best superpixel localization detection performance** of the fire within the image (example: ```superpixel-inceptionVxOnFire.py -m 4```) but at a lower throughput than the alternative, lesser detection performing _SP-InceptionV1-OnFire_ and _SP-InceptionV3-OnFire_ superpixel models (example: ```superpixel-inceptionVxOnFire.py -m 1``` or ```superpixel-inceptionVxOnFire.py -m 3```). For full comparison see most recent paper - [[Samath, 2019](https://breckon.org/toby/publications/papers/samarth19fire.pdf)]
-
-_Caveat:_ **if you need to convert the models** to protocol buffer (.pb) format (used by [OpenCV](http://www.opencv.org) DNN, [TensorFlow](https://www.tensorflow.org/), ...) and also tflite (used with [TensorFlow](https://www.tensorflow.org/)) then use the **_FireNet_** or **_InceptionV1-OnFire_ / _SP-InceptionV1-OnFire_** versions at the moment as, due to a long-standing [issue](https://github.com/tensorflow/tensorflow/issues/3628) in TensorFlow with the export (freezing) of the Batch Normalization layers, the protocol buffer (.pb) format and .tflite versions of the _...V3-OnFire_ and _...V4-OnFire_ have significantly lesser performance (which is to be expected, given the approach we use to workaround the problem).
-
----
 ## Fire Detection Datasets:
 
 The custom dataset used for training and evaluation can be found on [[Durham Collections - Dunnings/Breckon, 2018](https://collections.durham.ac.uk/collections/r1ww72bb497)] and [[Durham Collections - Samarth/Breckon, 2019](https://collections.durham.ac.uk/collections/r2jm214p16f)] (together with the trained network models). A direct download link for the dataset is [[Dunnings, 2018 - original data](https://collections.durham.ac.uk/downloads/r2d217qp536)] and [[Samarth, 2019 - additional data](https://collections.durham.ac.uk/downloads/r10r967374q)].
@@ -159,7 +105,7 @@ This can be similarly repeated with the ```inceptionVxOnFire-validation.py``` sc
 ---
 
 ## Example video:
-[![Examples](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/slic-ex.png)](https://youtu.be/RcNj8aMDer4)
+[![Examples](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/slic-ex.png)](https://www.youtube.com/embed/t6r2TndNSVY)
 Video Example - click image above to play.
 
 ---
@@ -169,42 +115,23 @@ Video Example - click image above to play.
 If you are making use of this work in any way (including our pre-trained models or datasets), _you must please_ reference the following articles in any report, publication, presentation, software release
 or any other associated materials:
 
-[Experimentally defined Convolutional Neural Network Architecture Variants for Non-temporal Real-time Fire Detection](https://breckon.org/toby/publications/papers/dunnings18fire.pdf)
-(Dunnings, Breckon), In Proc. International Conference on Image Processing, IEEE, 2018.
-```
-@InProceedings{dunnings18fire,
-  author =     {Dunnings, A. and Breckon, T.P.},
-  title =      {Experimentally defined Convolutional Nerual Network Architecture Variants for Non-temporal Real-time Fire Detection},
-  booktitle =  {Proc. International Conference on Image Processing},
-  pages =      {1558-1562},
-  year =       {2018},
-  month =      {September},
-  publisher =  {IEEE},
-  doi =        {10.1109/ICIP.2018.8451657},
-  keywords =   {simplified CNN, deep learning, fire detection, real-time, non-temporal, non-stationary visual fire detection, FireNet, InceptionV1OnFire},
-}
-```
-
-[Experimental Exploration of Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection](https://breckon.org/toby/publications/papers/samarth19fire.pdf)
-(Samarth, Bhowmik, Breckon), In Proc. International Conference on Machine Learning Applications, IEEE, 2019.
+[Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection](https://breckon.org/toby/publications/papers/thompson20fire.pdf)
+(Thomson, Bhowmik, Breckon), In Proc. International Conference on Machine Learning Applications, IEEE, 2020.
 ```
 @InProceedings{samarth19fire,
-  author =    {Samarth, G. and Bhowmik, N. and Breckon, T.P.},
-  title =     {Experimental Exploration of Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection},
+  author =    {Thomson, W. and Bhowmik, N. and Breckon, T.P.},
+  title =     {Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection},
   booktitle = {Proc. International Conference on Machine Learning Applications},
-  pages =     {653-658},
-  year =      {2019},
+  year =      {2020},
   month =     {December},
   publisher = {IEEE},
-  doi =       {10.1109/ICMLA.2019.00119},
-  keywords =  {fire detection, CNN, deep-learning real-time, non-temporal, InceptionV3OnFire, InceptionV4OnFire},
+  url = {http://breckon.org/toby/publications/papers/thompson20fire.pdf},
+  arxiv = {http://arxiv.org/abs/2010.08833},
+  note = {to appear},
+  category = {imageclass},
 }
 ```
 
 In addition the (very permissive) terms of the [LICENSE](LICENSE) must be adhered to.
-
-### Acknowledgements:
-
-Atharva (Art) Deshmukh (Durham University, _github and data set collation for publication_ for [Dunnings/Breckon, 2018] work).
 
 ---
