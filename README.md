@@ -1,6 +1,6 @@
 # Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection
 
-![Python Build/Test](https://github.com/tobybreckon/fire-detection-cnn/workflows/Python%20Build/Test/badge.svg) Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation)
+![Python Build/Test](https://github.com/tobybreckon/fire-detection-cnn/workflows/Python%20Build/Test/badge.svg) Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation).
 
 ## Architectures:
 ![FiNasNet-A-OnFire](images/nasnetonfire.png)
@@ -23,8 +23,91 @@ _"—Automatic visual fire detection is used to complement traditional fire dete
 
 [[Thomson, Bhowmik, Breckon, In Proc. International Conference on Machine Learning Applications, IEEE, 2020](https://breckon.org/toby/publications/papers/thompson20fire.pdf)]
 
----
+[[Talk](https://www.youtube.com/embed/1haTCOHgDtQ)] [[Example](https://www.youtube.com/embed/t6r2TndNSVY)]
 
+---
+## Installation
+The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using CPU and GPU and TensorRT.  
+### Requirements for Deskop/Laptop
+1. Linux (Ubuntu >= 18.04 distribution)
+2. CUDA >= 10.2, cuDNN >= 7.6.0
+3. Python ≥ 3.6
+4. [Optional] [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) 
+### Requirements for Nvidia Jetson Xavier NX
+1. Linux [(Ubuntu 18.04 distribution for Xavier NX)](https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit#intro)
+2. JetPack 4.4 (CUDA 10.2, cuDNN 8.0)
+3. Python 3.6
+4. [Optional] TensorRT - installs with JetPack  
+
+### Steps
+0. [Optional] create a new virtual environment. 
+
+    ~~~
+    sudo apt update
+    sudo apt install python3-dev python3-pip
+    ~~~
+    And activate the environment.
+    
+    ~~~
+    source ./venv/bin/activate # sh, bash, ksh, or zsh
+    ~~~
+1. First clone the repository:
+    ~~~
+    git clone https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn.git
+    ~~~
+
+2. Install [pytorch 1.5.0](https://pytorch.org/) with torchvision 0.6.0 (that matches the PyTorch installation). Install together from pytorch installation steps for [Jetson Xavier NX](https://forums.developer.nvidia.com/t/pytorch-for-jetson-nano-version-1-6-0-now-available/72048).
+
+3. Install the requirements
+
+    ~~~
+    pip3 install -r requirements.txt
+    ~~~
+---
+## Instructions to run inference using pre-trained models:
+We support inference for image/image directory, video/video directory, and webcam.
+
+1. Download pre-trained models (**nasnetonfire/shufflenetonfire**) in ```./weights``` directory.   
+2. To run {fire, no-fire} classification on full-frame:
+
+~~~
+python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO] 
+                                [--webcam] [--trt] [--model MODEL] 
+                                [--cpu] [--output OUTPUT]
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --image IMAGE    Path to image file or image directory
+  --video VIDEO    Path to video file or video directory
+  --webcam         Take inputs from webcam
+  --trt            Model run on TensorRT
+  --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
+  --cpu            If selected will run on CPU
+  --output OUTPUT  A directory to save output visualizations.If not given,
+                   will show output in an OpenCV window.
+
+~~~
+3. To run {fire, no-fire} superpixel localisation:
+
+~~~
+python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO] 
+                                [--webcam] [--trt] [--model MODEL] 
+                                [--cpu] [--output OUTPUT]
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --image IMAGE    Path to image file or image directory
+  --video VIDEO    Path to video file or video directory
+  --webcam         Take inputs from webcam.
+  --trt            Model run on TensorRT
+  --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
+  --cpu            If selected will run on CPU
+  --output OUTPUT  A directory to save output visualizations.If not given,
+                   will show output in an OpenCV window.
+
+~~~
+
+---
 ## Fire Detection Datasets:
 
 The custom dataset used for training and evaluation can be found on [[Durham Collections - Dunnings/Breckon, 2018](https://collections.durham.ac.uk/collections/r1ww72bb497)] and [[Durham Collections - Samarth/Breckon, 2019](https://collections.durham.ac.uk/collections/r2jm214p16f)] (together with the trained network models). A direct download link for the dataset is [[Dunnings, 2018 - original data](https://collections.durham.ac.uk/downloads/r2d217qp536)] and [[Samarth, 2019 - additional data](https://collections.durham.ac.uk/downloads/r10r967374q)].
@@ -44,70 +127,7 @@ Original frame (left), Frame after superpixel segmentation (middle), Frame after
 
 To download and test the supplied code and pre-trained models (with **TensorFlow 1.x / TFLearn 0.3.2 / OpenCV 4.x** installed) do:
 
-```
-$ git clone https://github.com/tobybreckon/fire-detection-cnn.git
-$ cd fire-detection-cnn
-$ sh ./download-models.sh
-$ python firenet.py models/test.mp4
-$ python inceptionVxOnFire.py -m 1 models/test.mp4
-$ python superpixel-inceptionVxOnFire.py -m 1 models/test.mp4
-```
 
-where ```-m x``` specifies the use of either of the _InceptionV1OnFire, InceptionV3OnFire, InceptionV4OnFire_
-models for ```x``` in ```[1,3,4]```. By default it uses _InceptionV1OnFire_ if ```-m``` is not specified.
-
-
-If by default you have **TensorFlow 2.x** installed on your system, then a workflow to make this repo work on your system is via a Tensorflow 1.x virtual environment (as TFLearn is not supported in TensorFlow 2.0 - this [issue](https://github.com/tflearn/tflearn/issues/1121)) is as follows:
-
-```
-$ virtualenv -p python3 ~/venv/tf-1.1.5-gpu
-$ source ~/venv/tf-1.1.5-gpu/bin/activate
-$ pip install tensorflow-gpu==1.15
-$ pip install tflearn
-$ pip install opencv-contrib-python
-....
-$ python3 firenet.py models/test.mp4
-```
-
----
-
-## Instructions to use pre-trained models with other frameworks:
-
-To convert the supplied pre-trained models from TFLearn checkpoint format to protocol buffer (.pb) format (used by [OpenCV](http://www.opencv.org) DNN, [TensorFlow](https://www.tensorflow.org/), ...) and also tflite (used with [TensorFlow](https://www.tensorflow.org/)) do:
-
-
-```
-$ cd converter
-$ python firenet-conversion.py
-$ python inceptionVxOnFire-conversion.py -m 1
-```
-
-This creates a set of six ```.pb``` and ```.tflite``` files inside the ```converter``` directory (```firenet.xxx``` / ```inceptionv1onfire.xxx```/```sp-inceptionv1onfire.xxx``` for ```xxx``` in ```[pb, tflite]```). The ```inceptionVxOnFire-conversion.py``` can be similarly run with ```-m 3``` and ```-m 4``` to generate the same conversions for the _InceptionV3OnFire_ and _InceptionV4OnFire_ models respectively.
-
-These alternative format files can then be validated  with the [OpenCV](http://www.opencv.org) DNN module (OpenCV > 4.1.0-pre) and [TensorFlow](https://www.tensorflow.org/) against the original (tflearn) version from within the same directory, in order to check that they all produce the same output (up to 3 decimal places) as follows:
-
-```
-$ python firenet-validation.py
-Load tflearn model from: ../models/FireNet ...OK
-Load protocolbuf (pb) model from: firenet.pb ...OK
-Load tflite model from: firenet.tflite ...OK
-Load test video from ../models/test.mp4 ...
-frame: 0        : TFLearn (original): [[9.999914e-01 8.576833e-06]]     : Tensorflow .pb (via opencv): [[9.999914e-01 8.576866e-06]]    : TFLite (via tensorflow): [[9.999914e-01 8.576899e-06]]: all equal test - PASS
-frame: 1        : TFLearn (original): [[9.999924e-01 7.609045e-06]]     : Tensorflow .pb (via opencv): [[9.999924e-01 7.608987e-06]]    : TFLite (via tensorflow): [[9.999924e-01 7.608980e-06]]: all equal test - PASS
-frame: 2        : TFLearn (original): [[9.999967e-01 3.373572e-06]]     : Tensorflow .pb (via opencv): [[9.999967e-01 3.373559e-06]]    : TFLite (via tensorflow): [[9.999967e-01 3.373456e-06]]: all equal test - PASS
-frame: 3        : TFLearn (original): [[9.999968e-01 3.165212e-06]]     : Tensorflow .pb (via opencv): [[9.999968e-01 3.165221e-06]]    : TFLite (via tensorflow): [[9.999968e-01 3.165176e-06]]: all equal test - PASS
-...
-```
-
-This can be similarly repeated with the ```inceptionVxOnFire-validation.py``` scripts with the options ```-m x``` for ```x``` in ```[1,3,4]``` for each of the InceptionVxOnFire models and similarly with the additional option ```-sp``` for each of the superpixel InceptionVxOnFire models (e.g. ```inceptionVxOnFire-validation.py -m 3 -sp``` validates the _InceptionV3OnFire_ superpixel model and so on). N.B. here the superpixel inceptionVxOnFire models are being validated against the whole image frame rather than superpixels just for simply showing consistent output between the original and converted models. Some ```FAIL```cases will be reported against this strict 3 decimal place criteria, but inspection often reveals a mildly larger ~0.1 difference (with the exception of the _...V3-OnFire_ and _...V4-OnFire_ caveat discussed above).
-
-**To convert to to other frameworks** (such as PyTorch, MXNet, Keras, ...) from these tensorflow formats: - please see the extensive deep neural network model conversion tools offered by the [MMdnn](https://github.com/Microsoft/MMdnn) project.
-
----
-
-## Example video:
-[![Examples](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/slic-ex.png)](https://www.youtube.com/embed/t6r2TndNSVY)
-Video Example - click image above to play.
 
 ---
 
