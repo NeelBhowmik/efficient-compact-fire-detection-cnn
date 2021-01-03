@@ -25,9 +25,12 @@ _"—Automatic visual fire detection is used to complement traditional fire dete
 
 [[Talk](https://www.youtube.com/embed/1haTCOHgDtQ)] [[Example](https://www.youtube.com/embed/t6r2TndNSVY)]
 
+Our previous works on fire detection using **Alexnet** and **InceptionVx** can be found [here](https://github.com/tobybreckon/fire-detection-cnn).
+
+
 ---
 ## Installation
-The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using CPU and GPU and TensorRT.  
+The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**GPU**/**TensorRT**.  
 ### Requirements for Deskop/Laptop
 1. Linux (Ubuntu >= 18.04 distribution)
 2. CUDA >= 10.2, cuDNN >= 7.6.0
@@ -56,7 +59,7 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using CPU and GP
     git clone https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn.git
     ~~~
 
-2. Install [pytorch 1.5.0](https://pytorch.org/) with torchvision 0.6.0 (that matches the PyTorch installation). Install together from pytorch installation steps for [Jetson Xavier NX](https://forums.developer.nvidia.com/t/pytorch-for-jetson-nano-version-1-6-0-now-available/72048).
+2. Install [pytorch >= 1.5.0](https://pytorch.org/) with torchvision (that matches the PyTorch installation). Install together from pytorch installation steps for [Jetson Xavier NX](https://forums.developer.nvidia.com/t/pytorch-for-jetson-nano-version-1-6-0-now-available/72048).
 
 3. Install the requirements
 
@@ -67,13 +70,13 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using CPU and GP
 ## Instructions to run inference using pre-trained models:
 We support inference for image/image directory, video/video directory, and webcam.
 
-1. Download pre-trained models (**nasnetonfire/shufflenetonfire**) in ```./weights``` directory.   
-2. To run {fire, no-fire} classification on full-frame:
+1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://durhamuniversity-my.sharepoint.com/:f:/g/personal/fndr59_durham_ac_uk/EhwAMy58KNBAput-udfWE5cB9grzG4opp6eZNP0BOXO4dw?e=2VJdrq)) in ```./weights``` directory.   
+2. To run {fire, no-fire} classification on **full-frame**:
 
 ~~~
 python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO] 
-                                [--webcam] [--trt] [--model MODEL] 
-                                [--cpu] [--output OUTPUT]
+                             [--webcam] [--trt] [--model MODEL] 
+                             [--cpu] [--output OUTPUT]
 
 optional arguments:
   -h, --help       show this help message and exit
@@ -87,7 +90,7 @@ optional arguments:
                    will show output in an OpenCV window.
 
 ~~~
-3. To run {fire, no-fire} superpixel localisation:
+3. To run {fire, no-fire} **superpixel localisation**:
 
 ~~~
 python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO] 
@@ -110,24 +113,11 @@ optional arguments:
 ---
 ## Fire Detection Datasets:
 
-The custom dataset used for training and evaluation can be found on [[Durham Collections - Dunnings/Breckon, 2018](https://collections.durham.ac.uk/collections/r1ww72bb497)] and [[Durham Collections - Samarth/Breckon, 2019](https://collections.durham.ac.uk/collections/r2jm214p16f)] (together with the trained network models). A direct download link for the dataset is [[Dunnings, 2018 - original data](https://collections.durham.ac.uk/downloads/r2d217qp536)] and [[Samarth, 2019 - additional data](https://collections.durham.ac.uk/downloads/r10r967374q)].
+The custom dataset used for training and evaluation can be found on [Durham Collections - Thomson/Bhowmik/Breckon, 2020](https://collections.durham.ac.uk/collections/r1ww72bb497). A direct download link for the dataset is [here](https://collections.durham.ac.uk/downloads/r2d217qp536).
 
-In addition, standard datasets such as [furg-fire-dataset](https://github.com/steffensbola/furg-fire-dataset) were also used for training and evaluation (and are included as a subset within the above datasets for [[Dunnings, 2018 - original data](https://collections.durham.ac.uk/downloads/r2d217qp536)]).
-
-* DOI for datsets - [http://doi.org/10.15128/r2d217qp536](http://doi.org/10.15128/r2d217qp536) and [http://doi.org/10.15128/r10r967374q](http://doi.org/10.15128/r10r967374q).
+* DOI for datsets - [http://doi.org/10.15128/r2d217qp536](http://doi.org/10.15128/r2d217qp536).
 
 A download script ```download-dataset.sh``` is also provided which will create an additional ```dataset``` directory containing the training dataset (10.5Gb in size, works on Linux/MacOS).
-
-![](https://github.com/tobybreckon/fire-detection-cnn/blob/master/images/slic-stages.png)
-Original frame (left), Frame after superpixel segmentation (middle), Frame after superpixel fire prediction (right)
-
----
-
-## Instructions to test pre-trained models:
-
-To download and test the supplied code and pre-trained models (with **TensorFlow 1.x / TFLearn 0.3.2 / OpenCV 4.x** installed) do:
-
-
 
 ---
 
