@@ -1,9 +1,11 @@
 ################################################################################
 
-# Example : perform live fire detection in image/video/webcam using NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
+# Example : perform live fire detection in image/video/webcam using superpixel localisation
+# and the superpixel trained version of the NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
+
 # Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby Breckon, Durham University, UK
 
-# License : https://github.com/tobybreckon/fire-detection-cnn/blob/master/LICENSE
+# License : https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
 
 ################################################################################
 
@@ -20,8 +22,6 @@ import numpy as np
 
 import torch
 import torchvision.transforms as transforms
-# import pycuda.driver as cuda
-# import pycuda.autoinit
 from models import shufflenetv2
 from models import nasnet_mobile_onfire
 
@@ -45,9 +45,8 @@ def data_transform(model):
 
 ################################################################################
 
-def read_img(frame):
-    small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-    small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+def proc_sp(small_frame, np_transforms):
+    # small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
     small_frame = Image.fromarray(small_frame)
     small_frame = np_transforms(small_frame).float()
     small_frame = small_frame.unsqueeze(0)
@@ -57,28 +56,60 @@ def read_img(frame):
 
 ################################################################################
 
+def pil_crop(img):
+    sp_pil = Image.fromarray(img)
+    imageBox = sp_pil.getbbox()
+    sp_crop = sp_pil.crop(imageBox)
+    np_sp_crop = np.array(sp_crop)  
+    # sp_crop_cv = cv2.cvtColor(np_sp_crop, cv2.COLOR_RGB2BGR)
+    return np_sp_crop 
+
+################################################################################
+
 def run_model_img(args, frame, model):
-    output = model(frame)
+    output = model(frame)[0]
     pred = torch.round(torch.sigmoid(output))
     return pred
 
 ################################################################################
 
-def draw_pred(args, frame, pred, fps_frame):
-    height, width, _ = frame.shape
+def draw_pred(args, frame, contours, prediction):
+    # height, width, _ = frame.shape
     if prediction == 1:
-        if args.image or args.webcam:
-            print(f'\t\t|____No-Fire | fps {fps_frame}')
-        cv2.rectangle(frame, (0, 0), (width, height), (0, 0, 255), 2)
-        cv2.putText(frame, 'No-Fire', (int(width/16), int(height/4)),
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.drawContours(frame, contours, -1, (0,0,255), 1)
     else:
-        if args.image or args.webcam:
-            print(f'\t\t|____Fire | fps {fps_frame}')
-        cv2.rectangle(frame, (0, 0), (width, height), (0, 255, 0), 2)
-        cv2.putText(frame, 'Fire', (int(width/16), int(height/4)),
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)    
+        cv2.drawContours(frame, contours, -1, (0,255,0), 1)    
     return frame
+
+################################################################################
+
+def process_sp(args, small_frame, np_transforms, model):
+    slic = cv2.ximgproc.createSuperpixelSLIC(small_frame, region_size=22)
+    slic.iterate(10)
+    segments = slic.getLabels()
+    
+    for (i, segVal) in enumerate(np.unique(segments)):
+        mask = np.zeros(small_frame.shape[:2], dtype='uint8')
+        mask[segments == segVal] = 255
+
+        if (int(cv2.__version__.split(".")[0]) >= 4):
+            contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        else:
+            im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        # contour_list.append(contours)
+        superpixel = cv2.bitwise_and(small_frame, small_frame, mask = mask)
+        superpixel = cv2.cvtColor(superpixel, cv2.COLOR_BGR2RGB)
+        
+        #PIL centre crop and data transformation
+        # superpixel = pil_crop(superpixel)
+        superpixel = proc_sp(superpixel, np_transforms)
+
+        # Model prediction
+        prediction = run_model_img(args, superpixel, model)
+       
+        # Draw prediction on superpixel 
+        draw_pred(args, small_frame, contours, prediction)
 
 ################################################################################
 # parse command line arguments
@@ -97,7 +128,6 @@ parser.add_argument(
 args = parser.parse_args()
 print(f'\n{args}')
 
-
 WINDOW_NAME = 'Detection'
 # uses cuda if available
 if args.cpu:
@@ -105,15 +135,15 @@ if args.cpu:
 else:
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-print('\n\nBegin {fire, no-fire} classification :')
+print('\n\nBegin {fire, no-fire} superpixel localisation :')
 
 # model load
 if args.model == "shufflenetonfire":
     model = shufflenetv2.shufflenet_v2_x0_5(pretrained=False, layers=[4, 8, 4], output_channels=[24, 48, 96, 192, 64], num_classes=1)
-    model.load_state_dict(torch.load('./weights/shufflenet_binary.pt', map_location=device))
+    model.load_state_dict(torch.load('./weights/shufflenet_sp.pt', map_location=device))
 elif args.model == "nasnetonfire":
     model = nasnet_mobile_onfire.nasnetamobile(num_classes=1, pretrained=False)
-    model.load_state_dict(torch.load('./weights/nasnet_binary.pt', map_location=device))
+    model.load_state_dict(torch.load('./weights/nasnet_sp.pt', map_location=device))
 else:
     print('Invalid Model.')
     exit()
@@ -139,62 +169,43 @@ if args.image:
     if os.path.isdir(args.image):
         fps = []
         for im in os.listdir(args.image):
-
-            start_t = time.time()
-
-            frame = cv2.imread(f'{args.image}/{im}')
-            # height, width, channels = frame.shape
-            small_frame = read_img(frame)
             print('\t|____Image processing: ', im)
             
+            frame = cv2.imread(f'{args.image}/{im}')
+            small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
+            
+            # Prediction on superpixel
             if args.trt:
-                prediction = run_model_img(args, small_frame, model_trt)
+                process_sp(args, small_frame, np_transforms, model_trt)
             else:
-                prediction = run_model_img(args, small_frame, model)
-            
-            stop_t = time.time()
-            inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
-            fps.append(fps_frame)
-            
-            frame = draw_pred(args,frame, prediction,fps_frame)
+                process_sp(args, small_frame, np_transforms, model)
             
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
-                cv2.imwrite(f'{args.output}/{im}', frame)
+                cv2.imwrite(f'{args.output}/{im}', small_frame)
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-                cv2.imshow(WINDOW_NAME, frame)
+                cv2.imshow(WINDOW_NAME, small_frame)
                 cv2.waitKey(0)
-                    
-        avg_fps = sum(fps)/len(fps)
-        print(f'\n|__Average fps {int(avg_fps)}')
 
     else:
-        start_t = time.time()
-
+        print('\t|____Image processing: ', args.image)
+        
         frame = cv2.imread(f'{args.image}')
-        small_frame = read_img(frame)
-        print('\t|____Image loaded: ', args.image)
-        
+        small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
+                
+        # Prediction on superpixel
         if args.trt:
-            prediction = run_model_img(args, small_frame, model_trt)
+            process_sp(args, small_frame, np_transforms, model_trt)
         else:
-            prediction = run_model_img(args, small_frame, model)
-        
-        stop_t = time.time()
-        inference_time = stop_t - start_t
-        fps_frame = int(1/inference_time)
-        fps.append(fps_frame)
-        
-        frame = draw_pred(args, frame, prediction,fps_frame)
+            process_sp(args, small_frame, np_transforms, model)
         
         if args.output:
             os.makedirs(args.output, exist_ok=True)
-            cv2.imwrite(f'{args.output}/{args.image.split("/")[-1]}', frame)
+            cv2.imwrite(f'{args.output}/{args.image.split("/")[-1]}', small_frame)
         else:
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-            cv2.imshow(WINDOW_NAME, frame)
+            cv2.imshow(WINDOW_NAME, small_frame)
             cv2.waitKey(0)
 
 # load and process input video
@@ -211,37 +222,31 @@ if args.video:
             img_array = []
 
             while (keepProcessing):
-                start_t = time.time()
                 ret, frame = video.read()
 
                 if not ret:
                     print("\t\t... end of video.")
                     break
 
-                small_frame = read_img(frame)
+                small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
                                             
+                # Prediction on superpixel
                 if args.trt:
-                    prediction = run_model_img(args, small_frame, model_trt)
+                    process_sp(args, small_frame, np_transforms, model_trt)
                 else:
-                    prediction = run_model_img(args, small_frame, model)
-                
-                stop_t = time.time()
-                inference_time = stop_t - start_t
-                fps_frame = int(1/inference_time)
-
-                frame = draw_pred(args,frame, prediction,fps_frame)
-                img_array.append(frame)
+                    process_sp(args, small_frame, np_transforms, model)
+                img_array.append(small_frame)
 
                 if args.output:
                     os.makedirs(args.output, exist_ok=True)
                 else:
                     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-                    cv2.imshow(WINDOW_NAME, frame)
+                    cv2.imshow(WINDOW_NAME, small_frame)
                     cv2.waitKey(int(fps))
             
             if args.output:
                 out = cv2.VideoWriter(
-                    filename=f'{args.output}/{args.video.split("/")[-1]}', 
+                    filename=f'{args.output}/{vid}', 
                     fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
                     fps=float(fps), 
                     frameSize=(width, height),
@@ -264,33 +269,27 @@ if args.video:
         img_array = []
 
         while (keepProcessing):
-            start_t = time.time()
             ret, frame = video.read()
 
             if not ret:
                 print(f"\t\t... end of video.")
                 break
 
-            small_frame = read_img(frame)
-                                        
+            small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
+                                            
+            # Prediction on superpixel
             if args.trt:
-                prediction = run_model_img(args, small_frame, model_trt)
+                process_sp(args, small_frame, np_transforms, model_trt)
             else:
-                prediction = run_model_img(args, small_frame, model)
-            
-            stop_t = time.time()
-            inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
-
-            frame = draw_pred(args,frame, prediction,fps_frame)
-            img_array.append(frame)
+                process_sp(args, small_frame, np_transforms, model)
+            img_array.append(small_frame)
 
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
                 
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-                cv2.imshow(WINDOW_NAME, frame)
+                cv2.imshow(WINDOW_NAME, small_frame)
                 cv2.waitKey(int(fps))
 
         if args.output:
@@ -311,20 +310,16 @@ if args.webcam:
     while cam.isOpened():
         success, frame = cam.read()
         if success:
-            start_t = time.time()
-            small_frame = read_img(frame)
+            small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
             
+            # Prediction on superpixel
             if args.trt:
-                prediction = run_model_img(args, small_frame, model_trt)
+                process_sp(args, small_frame, np_transforms, model_trt)
             else:
-                prediction = run_model_img(args, small_frame, model)
+                process_sp(args, small_frame, np_transforms, model)
             
-            stop_t = time.time()
-            inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
-            frame = draw_pred(args,frame, prediction,fps_frame)
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-            cv2.imshow(WINDOW_NAME, frame)
+            cv2.imshow(WINDOW_NAME, small_frame)
             if cv2.waitKey(1) == 27:
                 exit()
             

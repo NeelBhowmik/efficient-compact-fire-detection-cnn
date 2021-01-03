@@ -1,9 +1,11 @@
 ################################################################################
 
-# Example : perform live fire detection in image/video/webcam using NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
+# Example : perform live fire detection in image/video/webcam using 
+# NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
+
 # Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby Breckon, Durham University, UK
 
-# License : https://github.com/tobybreckon/fire-detection-cnn/blob/master/LICENSE
+# License : https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
 
 ################################################################################
 
@@ -20,8 +22,6 @@ import numpy as np
 
 import torch
 import torchvision.transforms as transforms
-# import pycuda.driver as cuda
-# import pycuda.autoinit
 from models import shufflenetv2
 from models import nasnet_mobile_onfire
 
@@ -45,7 +45,7 @@ def data_transform(model):
 
 ################################################################################
 
-def read_img(frame):
+def read_img(frame, np_transforms):
     small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
     small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
     small_frame = Image.fromarray(small_frame)
@@ -110,10 +110,10 @@ print('\n\nBegin {fire, no-fire} classification :')
 # model load
 if args.model == "shufflenetonfire":
     model = shufflenetv2.shufflenet_v2_x0_5(pretrained=False, layers=[4, 8, 4], output_channels=[24, 48, 96, 192, 64], num_classes=1)
-    model.load_state_dict(torch.load('./weights/shufflenet_binary.pt', map_location=device))
+    model.load_state_dict(torch.load('./weights/shufflenet_ff.pt', map_location=device))
 elif args.model == "nasnetonfire":
     model = nasnet_mobile_onfire.nasnetamobile(num_classes=1, pretrained=False)
-    model.load_state_dict(torch.load('./weights/nasnet_binary.pt', map_location=device))
+    model.load_state_dict(torch.load('./weights/nasnet_ff.pt', map_location=device))
 else:
     print('Invalid Model.')
     exit()
@@ -144,7 +144,7 @@ if args.image:
 
             frame = cv2.imread(f'{args.image}/{im}')
             # height, width, channels = frame.shape
-            small_frame = read_img(frame)
+            small_frame = read_img(frame, np_transforms)
             print('\t|____Image processing: ', im)
             
             if args.trt:
@@ -174,7 +174,7 @@ if args.image:
         start_t = time.time()
 
         frame = cv2.imread(f'{args.image}')
-        small_frame = read_img(frame)
+        small_frame = read_img(frame, np_transforms)
         print('\t|____Image loaded: ', args.image)
         
         if args.trt:
@@ -218,7 +218,7 @@ if args.video:
                     print("\t\t... end of video.")
                     break
 
-                small_frame = read_img(frame)
+                small_frame = read_img(frame, np_transforms)
                                             
                 if args.trt:
                     prediction = run_model_img(args, small_frame, model_trt)
@@ -241,7 +241,7 @@ if args.video:
             
             if args.output:
                 out = cv2.VideoWriter(
-                    filename=f'{args.output}/{args.video.split("/")[-1]}', 
+                    filename=f'{args.output}/{vid}', 
                     fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
                     fps=float(fps), 
                     frameSize=(width, height),
@@ -271,7 +271,7 @@ if args.video:
                 print(f"\t\t... end of video.")
                 break
 
-            small_frame = read_img(frame)
+            small_frame = read_img(frame, np_transforms)
                                         
             if args.trt:
                 prediction = run_model_img(args, small_frame, model_trt)
@@ -312,7 +312,7 @@ if args.webcam:
         success, frame = cam.read()
         if success:
             start_t = time.time()
-            small_frame = read_img(frame)
+            small_frame = read_img(frame, np_transforms)
             
             if args.trt:
                 prediction = run_model_img(args, small_frame, model_trt)
