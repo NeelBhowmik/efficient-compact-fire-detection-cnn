@@ -1,1 +1,1 @@
-# efficient-compact-fire-detection-cnn
+# Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection
