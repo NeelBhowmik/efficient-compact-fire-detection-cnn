@@ -56,6 +56,7 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
     ~~~
     pip3 install -r requirements.txt
     ~~~
+4. [Optional] Install [torch2trt](https://nvidia-ai-iot.github.io/torch2trt/master/getting_started.html) to enable TensorRT mode.
 ---
 ## Instructions to run inference using pre-trained models:
 We support inference for image/image directory, video/video directory, and webcam.

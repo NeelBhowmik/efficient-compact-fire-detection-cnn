@@ -99,11 +99,18 @@ print(f'\n{args}')
 
 
 WINDOW_NAME = 'Detection'
+
+
+
 # uses cuda if available
 if args.cpu:
     device = torch.device('cpu')
 else:
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+if args.cpu and args.trt:
+    print(f'\n>>>>TensorRT runs only on gpu. Exit.')
+    exit()
 
 print('\n\nBegin {fire, no-fire} classification :')
 
