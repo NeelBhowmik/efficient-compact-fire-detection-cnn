@@ -85,7 +85,7 @@ def draw_pred(args, frame, pred, fps_frame):
 parser = argparse.ArgumentParser()
 parser.add_argument("--image", help="Path to image file or image directory")
 parser.add_argument("--video", help="Path to video file or video directory")
-parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam.")
+parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam")
 parser.add_argument("--trt", action="store_true", help="Model run on TensorRT")
 parser.add_argument("--model", default='shufflenetonfire', help="Select the model {shufflenetonfire, nasnetonfire}")
 parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")

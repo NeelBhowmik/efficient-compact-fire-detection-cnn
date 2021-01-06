@@ -1,6 +1,6 @@
 # Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection
 
-![Python Build/Test](https://github.com/tobybreckon/fire-detection-cnn/workflows/Python%20Build/Test/badge.svg) Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation).
+Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenCV 3.x / 4.x](http://www.opencv.org) (requires opencv extra modules - ximgproc module for superpixel segmentation).
 
 ![Architectures](images/icmla_fire2020_ex.png)
 
@@ -92,7 +92,7 @@ optional arguments:
   -h, --help       show this help message and exit
   --image IMAGE    Path to image file or image directory
   --video VIDEO    Path to video file or video directory
-  --webcam         Take inputs from webcam.
+  --webcam         Take inputs from webcam
   --trt            Model run on TensorRT
   --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
   --cpu            If selected will run on CPU
@@ -120,7 +120,7 @@ or any other associated materials:
 [Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection](https://breckon.org/toby/publications/papers/thompson20fire.pdf)
 (Thomson, Bhowmik, Breckon), In Proc. International Conference on Machine Learning Applications, IEEE, 2020.
 ```
-@InProceedings{samarth19fire,
+@InProceedings{thompson20fire,
   author =    {Thomson, W. and Bhowmik, N. and Breckon, T.P.},
   title =     {Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection},
   booktitle = {Proc. International Conference on Machine Learning Applications},
