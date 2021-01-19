@@ -61,7 +61,7 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
 ## Instructions to run inference using pre-trained models:
 We support inference for image/image directory, video/video directory, and webcam.
 
-1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://durhamuniversity-my.sharepoint.com/:f:/g/personal/fndr59_durham_ac_uk/EhwAMy58KNBAput-udfWE5cB9grzG4opp6eZNP0BOXO4dw?e=2VJdrq)) in ```./weights``` directory.   
+1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://doi.org/10.15128/r1tb09j570z)) in ```./weights``` directory. A download script ```download-models.sh``` is also provided which will create an additional ```weights``` directory containing the pre-trained models.
 2. To run {fire, no-fire} classification on **full-frame**:
 
 ~~~
@@ -76,6 +76,7 @@ optional arguments:
   --webcam         Take inputs from webcam
   --trt            Model run on TensorRT
   --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
+  --weight WEIGHT  Model weight file path
   --cpu            If selected will run on CPU
   --output OUTPUT  A directory to save output visualizations.If not given,
                    will show output in an OpenCV window.
@@ -95,6 +96,7 @@ optional arguments:
   --webcam         Take inputs from webcam
   --trt            Model run on TensorRT
   --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
+  --weight WEIGHT  Model weight file path
   --cpu            If selected will run on CPU
   --output OUTPUT  A directory to save output visualizations.If not given,
                    will show output in an OpenCV window.

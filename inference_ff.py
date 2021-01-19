@@ -88,6 +88,7 @@ parser.add_argument("--video", help="Path to video file or video directory")
 parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam")
 parser.add_argument("--trt", action="store_true", help="Model run on TensorRT")
 parser.add_argument("--model", default='shufflenetonfire', help="Select the model {shufflenetonfire, nasnetonfire}")
+parser.add_argument("--weight", help="Model weight file path")
 parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")
 parser.add_argument(
     "--output", 
@@ -117,10 +118,18 @@ print('\n\nBegin {fire, no-fire} classification :')
 # model load
 if args.model == "shufflenetonfire":
     model = shufflenetv2.shufflenet_v2_x0_5(pretrained=False, layers=[4, 8, 4], output_channels=[24, 48, 96, 192, 64], num_classes=1)
-    model.load_state_dict(torch.load('./weights/shufflenet_ff.pt', map_location=device))
+    if args.weight:
+        w_path= args.weight
+    else:
+        w_path= './weights/shufflenet_ff.pt'
+    model.load_state_dict(torch.load(w_path, map_location=device))
 elif args.model == "nasnetonfire":
     model = nasnet_mobile_onfire.nasnetamobile(num_classes=1, pretrained=False)
-    model.load_state_dict(torch.load('./weights/nasnet_ff.pt', map_location=device))
+    if args.weight:
+        w_path= args.weight
+    else:
+        w_path= './weights/nasnet_ff.pt'
+    model.load_state_dict(torch.load(w_path, map_location=device))
 else:
     print('Invalid Model.')
     exit()

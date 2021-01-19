@@ -4,18 +4,20 @@
 
 ################################################################################
 
-# *************** ICMLA 2020 paper dataset
+# ************ ICLMA 2020 paper models - shufflenetonfire / nasnetonfire
+
+echo; echo
 
 ################################################################################
 
-URL=https://collections.durham.ac.uk/downloads/r2d217qp536
-DIR_LOCAL_TARGET=dataset/dunnings-2018
+URL=https://collections.durham.ac.uk/downloads/r1tb09j570z
+DIR_LOCAL_TARGET=weights
 
-FILE_NAME=fire-dataset-dunnings-r2d217qp536-version1.zip
-DIR_NAME_UNZIPPED=fire-dataset-dunnings
-MD5_SUM=44c56cd3df8931c28b02910d35a4d105
+FILE_NAME=thomson-2020-fire-detection-pretrained-models-pytorch--version1-r1tb09j570z.zip
+DIR_NAME_UNZIPPED=thomson-2020-fire-detection-pretrained-models-pytorch--version1-r1tb09j570z
+MD5_SUM=6511b75be1c36147a94c98587d6bccb6
 
-IDENTIFIER_STRING="ICIP 2018 (Dunnings) dataset"
+IDENTIFIER_STRING="ICLMA 2020 Fire Detection CNN (shufflenetonfire / nasnetonfire) models"
 
 UNCOMPRESS_COMMAND="unzip -q"
 
@@ -61,17 +63,17 @@ echo "Unpacking the compressed file (using $UNCOMPRESS_COMMAND)..."
 
 $UNCOMPRESS_COMMAND $FILE_NAME
 
-echo "Tidying up..."
+# echo "Tidying up..."
 
-mv $DIR_NAME_UNZIPPED/* .
+W_FILE=weights.zip
+
+$UNCOMPRESS_COMMAND $DIR_NAME_UNZIPPED/$W_FILE
 
 rm $FILE_NAME && rm -r $DIR_NAME_UNZIPPED
+mv $DIR_LOCAL_TARGET/* ./
+rm -r $DIR_LOCAL_TARGET
 
-cd ..
+echo "... completed -> required $IDENTIFIER_STRING are now in $DIR_LOCAL_TARGET/"
 
-################################################################################
-
-echo "... completed -> required $IDENTIFIER_STRING is now in $DIR_LOCAL_TARGET/"
 echo "[Done]"
-
 ################################################################################
