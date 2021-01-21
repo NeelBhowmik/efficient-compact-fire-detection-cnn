@@ -66,7 +66,8 @@ We support inference for image/image directory, video/video directory, and webca
 
 ~~~
 python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO] 
-                             [--webcam] [--trt] [--model MODEL] 
+                             [--webcam] [--trt]
+                             [--model MODEL] [--weight WEIGHT]
                              [--cpu] [--output OUTPUT]
 
 optional arguments:
@@ -86,8 +87,9 @@ optional arguments:
 
 ~~~
 python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO] 
-                                [--webcam] [--trt] [--model MODEL] 
-                                [--cpu] [--output OUTPUT]
+                                     [--webcam] [--trt]
+                                     [--model MODEL] [--weight WEIGHT]
+                                     [--cpu] [--output OUTPUT]
 
 optional arguments:
   -h, --help       show this help message and exit
