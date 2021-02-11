@@ -9,7 +9,7 @@ Tested using Python >= 3.6.x, [PyTorch >= 1.5](https://pytorch.org/), and [OpenC
 
 ## Abstract:
 
-_"—Automatic visual fire detection is used to complement traditional fire detection sensor systems (smoke/heat). In this work, we investigate different Convolutional Neural Network (CNN) architectures and their variants for the nontemporal real-time bounds detection of fire pixel regions in video (or still) imagery. Two reduced complexity compact CNN architectures (NasNet-A-OnFire and ShuffleNetV2-OnFire) are proposed through experimental analysis to optimise the computational efficiency for this task. The results improve upon the current state-of-the-art solution for fire detection, achieving an accuracy of 95% for full-frame binary classification and 97% for superpixel localisation. We notably achieve a classification speed up by a factor of 2.3× for binary classification and 1.3× for superpixel localisation, with runtime of 40 fps and 18 fps respectively, outperforming prior work in the field presenting an efficient, robust and real-time solution for fire region detection. Subsequent implementation on low-powered devices (Nvidia Xavier-NX, achieving 49 fps for full-frame classification via ShuffleNetV2-OnFire) demonstrates our architectures are suitable for various real-world deployment applications."_
+_" Automatic visual fire detection is used to complement traditional fire detection sensor systems (smoke/heat). In this work, we investigate different Convolutional Neural Network (CNN) architectures and their variants for the nontemporal real-time bounds detection of fire pixel regions in video (or still) imagery. Two reduced complexity compact CNN architectures (NasNet-A-OnFire and ShuffleNetV2-OnFire) are proposed through experimental analysis to optimise the computational efficiency for this task. The results improve upon the current state-of-the-art solution for fire detection, achieving an accuracy of 95% for full-frame binary classification and 97% for superpixel localisation. We notably achieve a classification speed up by a factor of 2.3× for binary classification and 1.3× for superpixel localisation, with runtime of 40 fps and 18 fps respectively, outperforming prior work in the field presenting an efficient, robust and real-time solution for fire region detection. Subsequent implementation on low-powered devices (Nvidia Xavier-NX, achieving 49 fps for full-frame classification via ShuffleNetV2-OnFire) demonstrates our architectures are suitable for various real-world deployment applications."_
 
 [[Thomson, Bhowmik, Breckon, In Proc. International Conference on Machine Learning Applications, IEEE, 2020](https://breckon.org/toby/publications/papers/thompson20fire.pdf)]
 
@@ -25,7 +25,7 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
 1. Linux (Ubuntu >= 18.04 distribution)
 2. CUDA >= 10.2, cuDNN >= 7.6.0
 3. Python ≥ 3.6
-4. [Optional] [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) 
+4. [Optional] [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html)
 ### Requirements for Nvidia Jetson Xavier NX
 1. Linux [(Ubuntu 18.04 distribution for Xavier NX)](https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit#intro)
 2. JetPack 4.4 (CUDA 10.2, cuDNN 8.0)
@@ -33,14 +33,14 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
 4. [Optional] TensorRT - installs with JetPack  
 
 ### Steps
-0. [Optional] create a new virtual environment. 
+0. [Optional] create a new virtual environment.
 
     ~~~
     sudo apt update
     sudo apt install python3-dev python3-pip
     ~~~
     And activate the environment.
-    
+
     ~~~
     source ./venv/bin/activate # sh, bash, ksh, or zsh
     ~~~
@@ -65,7 +65,7 @@ We support inference for image/image directory, video/video directory, and webca
 2. To run {fire, no-fire} classification on **full-frame**:
 
 ~~~
-python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO] 
+python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO]
                              [--webcam] [--trt]
                              [--model MODEL] [--weight WEIGHT]
                              [--cpu] [--output OUTPUT]
@@ -83,10 +83,19 @@ optional arguments:
                    will show output in an OpenCV window.
 
 ~~~
+
+e.g. as follows ....
+
+~~~
+
+ python3 inference_ff.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
+
+~~~
+
 3. To run {fire, no-fire} **superpixel localisation**:
 
 ~~~
-python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO] 
+python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO]
                                      [--webcam] [--trt]
                                      [--model MODEL] [--weight WEIGHT]
                                      [--cpu] [--output OUTPUT]
@@ -102,6 +111,14 @@ optional arguments:
   --cpu            If selected will run on CPU
   --output OUTPUT  A directory to save output visualizations.If not given,
                    will show output in an OpenCV window.
+
+~~~
+
+e.g. as follows ....
+
+~~~
+
+ python3 inference_ff.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
 
 ~~~
 
