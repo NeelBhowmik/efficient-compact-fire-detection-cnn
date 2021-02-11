@@ -1,13 +1,16 @@
-################################################################################
+##########################################################################
 
 # Example : perform live fire detection in image/video/webcam using superpixel localisation
-# and the superpixel trained version of the NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
+# and the superpixel trained version of the NasNet-A-OnFire,
+# ShuffleNetV2-OnFire CNN models.
 
-# Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby Breckon, Durham University, UK
+# Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby
+# Breckon, Durham University, UK
 
-# License : https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
+# License :
+# https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
 
-################################################################################
+##########################################################################
 
 import cv2
 import os
@@ -18,14 +21,15 @@ import argparse
 import time
 import numpy as np
 
-################################################################################
+##########################################################################
 
 import torch
 import torchvision.transforms as transforms
 from models import shufflenetv2
 from models import nasnet_mobile_onfire
 
-################################################################################
+##########################################################################
+
 
 def data_transform(model):
     # transforms needed for shufflenetonfire
@@ -33,28 +37,30 @@ def data_transform(model):
         np_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-            ])
+        ])
     # transforms needed for nasnetonfire
     if model == 'nasnetonfire':
         np_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ])
+        ])
 
     return np_transforms
 
-################################################################################
+##########################################################################
+
 
 def proc_sp(small_frame, np_transforms):
     # small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
     small_frame = Image.fromarray(small_frame)
     small_frame = np_transforms(small_frame).float()
     small_frame = small_frame.unsqueeze(0)
-    small_frame =  small_frame.to(device)
+    small_frame = small_frame.to(device)
 
     return small_frame
 
-################################################################################
+##########################################################################
+
 
 def pil_crop(img):
     sp_pil = Image.fromarray(img)
@@ -64,24 +70,27 @@ def pil_crop(img):
     # sp_crop_cv = cv2.cvtColor(np_sp_crop, cv2.COLOR_RGB2BGR)
     return np_sp_crop
 
-################################################################################
+##########################################################################
+
 
 def run_model_img(args, frame, model):
     output = model(frame)[0]
     pred = torch.round(torch.sigmoid(output))
     return pred
 
-################################################################################
+##########################################################################
+
 
 def draw_pred(args, frame, contours, prediction):
     # height, width, _ = frame.shape
     if prediction == 1:
-        cv2.drawContours(frame, contours, -1, (0,0,255), 1)
+        cv2.drawContours(frame, contours, -1, (0, 0, 255), 1)
     else:
-        cv2.drawContours(frame, contours, -1, (0,255,0), 1)
+        cv2.drawContours(frame, contours, -1, (0, 255, 0), 1)
     return frame
 
-################################################################################
+##########################################################################
+
 
 def process_sp(args, small_frame, np_transforms, model):
     slic = cv2.ximgproc.createSuperpixelSLIC(small_frame, region_size=22)
@@ -93,15 +102,17 @@ def process_sp(args, small_frame, np_transforms, model):
         mask[segments == segVal] = 255
 
         if (int(cv2.__version__.split(".")[0]) >= 4):
-            contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            contours, hierarchy = cv2.findContours(
+                mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         else:
-            im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            im2, contours, hierarchy = cv2.findContours(
+                mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # contour_list.append(contours)
-        superpixel = cv2.bitwise_and(small_frame, small_frame, mask = mask)
+        superpixel = cv2.bitwise_and(small_frame, small_frame, mask=mask)
         superpixel = cv2.cvtColor(superpixel, cv2.COLOR_BGR2RGB)
 
-        #PIL centre crop and data transformation
+        # PIL centre crop and data transformation
         # superpixel = pil_crop(superpixel)
         superpixel = proc_sp(superpixel, np_transforms)
 
@@ -111,16 +122,26 @@ def process_sp(args, small_frame, np_transforms, model):
         # Draw prediction on superpixel
         draw_pred(args, small_frame, contours, prediction)
 
-################################################################################
+
+##########################################################################
 # parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--image", help="Path to image file or image directory")
 parser.add_argument("--video", help="Path to video file or video directory")
-parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam")
+parser.add_argument(
+    "--webcam",
+    action="store_true",
+    help="Take inputs from webcam")
 parser.add_argument("--trt", action="store_true", help="Model run on TensorRT")
-parser.add_argument("--model", default='shufflenetonfire', help="Select the model {shufflenetonfire, nasnetonfire}")
+parser.add_argument(
+    "--model",
+    default='shufflenetonfire',
+    help="Select the model {shufflenetonfire, nasnetonfire}")
 parser.add_argument("--weight", help="Model weight file path")
-parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")
+parser.add_argument(
+    "--cpu",
+    action="store_true",
+    help="If selected will run on CPU")
 parser.add_argument(
     "--output",
     help="A directory to save output visualizations."
@@ -144,18 +165,21 @@ print('\n\nBegin {fire, no-fire} superpixel localisation :')
 
 # model load
 if args.model == "shufflenetonfire":
-    model = shufflenetv2.shufflenet_v2_x0_5(pretrained=False, layers=[4, 8, 4], output_channels=[24, 48, 96, 192, 64], num_classes=1)
+    model = shufflenetv2.shufflenet_v2_x0_5(
+        pretrained=False, layers=[
+            4, 8, 4], output_channels=[
+            24, 48, 96, 192, 64], num_classes=1)
     if args.weight:
-        w_path= args.weight
+        w_path = args.weight
     else:
-        w_path= './weights/shufflenet_sp.pt'
+        w_path = './weights/shufflenet_sp.pt'
     model.load_state_dict(torch.load(w_path, map_location=device))
 elif args.model == "nasnetonfire":
     model = nasnet_mobile_onfire.nasnetamobile(num_classes=1, pretrained=False)
     if args.weight:
-        w_path= args.weight
+        w_path = args.weight
     else:
-        w_path= './weights/nasnet_sp.pt'
+        w_path = './weights/nasnet_sp.pt'
     model.load_state_dict(torch.load(w_path, map_location=device))
 else:
     print('Invalid Model.')
@@ -215,7 +239,9 @@ if args.image:
 
         if args.output:
             os.makedirs(args.output, exist_ok=True)
-            cv2.imwrite(f'{args.output}/{args.image.split("/")[-1]}', small_frame)
+            cv2.imwrite(
+                f'{args.output}/{args.image.split("/")[-1]}',
+                small_frame)
         else:
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, small_frame)
@@ -269,7 +295,6 @@ if args.video:
                 for i in range(len(img_array)):
                     out.write(img_array[i])
                 out.release()
-
 
     else:
         print('\t|____Video processing: ', args.video)

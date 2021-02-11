@@ -1,13 +1,15 @@
-################################################################################
+##########################################################################
 
 # Example : perform live fire detection in image/video/webcam using
 # NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
 
-# Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby Breckon, Durham University, UK
+# Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby
+# Breckon, Durham University, UK
 
-# License : https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
+# License :
+# https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn/blob/main/LICENSE
 
-################################################################################
+##########################################################################
 
 import cv2
 import os
@@ -18,14 +20,15 @@ import argparse
 import time
 import numpy as np
 
-################################################################################
+##########################################################################
 
 import torch
 import torchvision.transforms as transforms
 from models import shufflenetv2
 from models import nasnet_mobile_onfire
 
-################################################################################
+##########################################################################
+
 
 def data_transform(model):
     # transforms needed for shufflenetonfire
@@ -33,17 +36,18 @@ def data_transform(model):
         np_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-            ])
+        ])
     # transforms needed for nasnetonfire
     if model == 'nasnetonfire':
         np_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ])
+        ])
 
     return np_transforms
 
-################################################################################
+##########################################################################
+
 
 def read_img(frame, np_transforms):
     small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
@@ -51,18 +55,20 @@ def read_img(frame, np_transforms):
     small_frame = Image.fromarray(small_frame)
     small_frame = np_transforms(small_frame).float()
     small_frame = small_frame.unsqueeze(0)
-    small_frame =  small_frame.to(device)
+    small_frame = small_frame.to(device)
 
     return small_frame
 
-################################################################################
+##########################################################################
+
 
 def run_model_img(args, frame, model):
     output = model(frame)
     pred = torch.round(torch.sigmoid(output))
     return pred
 
-################################################################################
+##########################################################################
+
 
 def draw_pred(args, frame, pred, fps_frame):
     height, width, _ = frame.shape
@@ -70,26 +76,36 @@ def draw_pred(args, frame, pred, fps_frame):
         if args.image or args.webcam:
             print(f'\t\t|____No-Fire | fps {fps_frame}')
         cv2.rectangle(frame, (0, 0), (width, height), (0, 0, 255), 2)
-        cv2.putText(frame, 'No-Fire', (int(width/16), int(height/4)),
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, 'No-Fire', (int(width / 16), int(height / 4)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
     else:
         if args.image or args.webcam:
             print(f'\t\t|____Fire | fps {fps_frame}')
         cv2.rectangle(frame, (0, 0), (width, height), (0, 255, 0), 2)
-        cv2.putText(frame, 'Fire', (int(width/16), int(height/4)),
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(frame, 'Fire', (int(width / 16), int(height / 4)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     return frame
 
-################################################################################
+
+##########################################################################
 # parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--image", help="Path to image file or image directory")
 parser.add_argument("--video", help="Path to video file or video directory")
-parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam")
+parser.add_argument(
+    "--webcam",
+    action="store_true",
+    help="Take inputs from webcam")
 parser.add_argument("--trt", action="store_true", help="Model run on TensorRT")
-parser.add_argument("--model", default='shufflenetonfire', help="Select the model {shufflenetonfire, nasnetonfire}")
+parser.add_argument(
+    "--model",
+    default='shufflenetonfire',
+    help="Select the model {shufflenetonfire, nasnetonfire}")
 parser.add_argument("--weight", help="Model weight file path")
-parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")
+parser.add_argument(
+    "--cpu",
+    action="store_true",
+    help="If selected will run on CPU")
 parser.add_argument(
     "--output",
     help="A directory to save output visualizations."
@@ -100,7 +116,6 @@ print(f'\n{args}')
 
 
 WINDOW_NAME = 'Detection'
-
 
 
 # uses cuda if available
@@ -117,18 +132,21 @@ print('\n\nBegin {fire, no-fire} classification :')
 
 # model load
 if args.model == "shufflenetonfire":
-    model = shufflenetv2.shufflenet_v2_x0_5(pretrained=False, layers=[4, 8, 4], output_channels=[24, 48, 96, 192, 64], num_classes=1)
+    model = shufflenetv2.shufflenet_v2_x0_5(
+        pretrained=False, layers=[
+            4, 8, 4], output_channels=[
+            24, 48, 96, 192, 64], num_classes=1)
     if args.weight:
-        w_path= args.weight
+        w_path = args.weight
     else:
-        w_path= './weights/shufflenet_ff.pt'
+        w_path = './weights/shufflenet_ff.pt'
     model.load_state_dict(torch.load(w_path, map_location=device))
 elif args.model == "nasnetonfire":
     model = nasnet_mobile_onfire.nasnetamobile(num_classes=1, pretrained=False)
     if args.weight:
-        w_path= args.weight
+        w_path = args.weight
     else:
-        w_path= './weights/nasnet_ff.pt'
+        w_path = './weights/nasnet_ff.pt'
     model.load_state_dict(torch.load(w_path, map_location=device))
 else:
     print('Invalid Model.')
@@ -170,10 +188,10 @@ if args.image:
 
             stop_t = time.time()
             inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
+            fps_frame = int(1 / inference_time)
             fps.append(fps_frame)
 
-            frame = draw_pred(args,frame, prediction,fps_frame)
+            frame = draw_pred(args, frame, prediction, fps_frame)
 
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
@@ -183,7 +201,7 @@ if args.image:
                 cv2.imshow(WINDOW_NAME, frame)
                 cv2.waitKey(0)
 
-        avg_fps = sum(fps)/len(fps)
+        avg_fps = sum(fps) / len(fps)
         print(f'\n|__Average fps {int(avg_fps)}')
 
     else:
@@ -200,10 +218,10 @@ if args.image:
 
         stop_t = time.time()
         inference_time = stop_t - start_t
-        fps_frame = int(1/inference_time)
+        fps_frame = int(1 / inference_time)
         fps.append(fps_frame)
 
-        frame = draw_pred(args, frame, prediction,fps_frame)
+        frame = draw_pred(args, frame, prediction, fps_frame)
 
         if args.output:
             os.makedirs(args.output, exist_ok=True)
@@ -243,9 +261,9 @@ if args.video:
 
                 stop_t = time.time()
                 inference_time = stop_t - start_t
-                fps_frame = int(1/inference_time)
+                fps_frame = int(1 / inference_time)
 
-                frame = draw_pred(args,frame, prediction,fps_frame)
+                frame = draw_pred(args, frame, prediction, fps_frame)
                 img_array.append(frame)
 
                 if args.output:
@@ -267,7 +285,6 @@ if args.video:
                 for i in range(len(img_array)):
                     out.write(img_array[i])
                 out.release()
-
 
     else:
         print('\t|____Video processing: ', args.video)
@@ -296,9 +313,9 @@ if args.video:
 
             stop_t = time.time()
             inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
+            fps_frame = int(1 / inference_time)
 
-            frame = draw_pred(args,frame, prediction,fps_frame)
+            frame = draw_pred(args, frame, prediction, fps_frame)
             img_array.append(frame)
 
             if args.output:
@@ -337,8 +354,8 @@ if args.webcam:
 
             stop_t = time.time()
             inference_time = stop_t - start_t
-            fps_frame = int(1/inference_time)
-            frame = draw_pred(args,frame, prediction,fps_frame)
+            fps_frame = int(1 / inference_time)
+            frame = draw_pred(args, frame, prediction, fps_frame)
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, frame)
             key = cv2.waitKey(1) & 0xFF
