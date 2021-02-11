@@ -1,6 +1,6 @@
 ################################################################################
 
-# Example : perform live fire detection in image/video/webcam using 
+# Example : perform live fire detection in image/video/webcam using
 # NasNet-A-OnFire, ShuffleNetV2-OnFire CNN models.
 
 # Copyright (c) 2020/21 - William Thompson / Neelanjan Bhowmik / Toby Breckon, Durham University, UK
@@ -52,8 +52,8 @@ def read_img(frame, np_transforms):
     small_frame = np_transforms(small_frame).float()
     small_frame = small_frame.unsqueeze(0)
     small_frame =  small_frame.to(device)
-    
-    return small_frame 
+
+    return small_frame
 
 ################################################################################
 
@@ -77,7 +77,7 @@ def draw_pred(args, frame, pred, fps_frame):
             print(f'\t\t|____Fire | fps {fps_frame}')
         cv2.rectangle(frame, (0, 0), (width, height), (0, 255, 0), 2)
         cv2.putText(frame, 'Fire', (int(width/16), int(height/4)),
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)    
+            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     return frame
 
 ################################################################################
@@ -91,7 +91,7 @@ parser.add_argument("--model", default='shufflenetonfire', help="Select the mode
 parser.add_argument("--weight", help="Model weight file path")
 parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")
 parser.add_argument(
-    "--output", 
+    "--output",
     help="A directory to save output visualizations."
     "If not given , will show output in an OpenCV window."
 )
@@ -162,19 +162,19 @@ if args.image:
             # height, width, channels = frame.shape
             small_frame = read_img(frame, np_transforms)
             print('\t|____Image processing: ', im)
-            
+
             if args.trt:
                 prediction = run_model_img(args, small_frame, model_trt)
             else:
                 prediction = run_model_img(args, small_frame, model)
-            
+
             stop_t = time.time()
             inference_time = stop_t - start_t
             fps_frame = int(1/inference_time)
             fps.append(fps_frame)
-            
+
             frame = draw_pred(args,frame, prediction,fps_frame)
-            
+
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
                 cv2.imwrite(f'{args.output}/{im}', frame)
@@ -182,7 +182,7 @@ if args.image:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                 cv2.imshow(WINDOW_NAME, frame)
                 cv2.waitKey(0)
-                    
+
         avg_fps = sum(fps)/len(fps)
         print(f'\n|__Average fps {int(avg_fps)}')
 
@@ -192,19 +192,19 @@ if args.image:
         frame = cv2.imread(f'{args.image}')
         small_frame = read_img(frame, np_transforms)
         print('\t|____Image loaded: ', args.image)
-        
+
         if args.trt:
             prediction = run_model_img(args, small_frame, model_trt)
         else:
             prediction = run_model_img(args, small_frame, model)
-        
+
         stop_t = time.time()
         inference_time = stop_t - start_t
         fps_frame = int(1/inference_time)
         fps.append(fps_frame)
-        
+
         frame = draw_pred(args, frame, prediction,fps_frame)
-        
+
         if args.output:
             os.makedirs(args.output, exist_ok=True)
             cv2.imwrite(f'{args.output}/{args.image.split("/")[-1]}', frame)
@@ -235,12 +235,12 @@ if args.video:
                     break
 
                 small_frame = read_img(frame, np_transforms)
-                                            
+
                 if args.trt:
                     prediction = run_model_img(args, small_frame, model_trt)
                 else:
                     prediction = run_model_img(args, small_frame, model)
-                
+
                 stop_t = time.time()
                 inference_time = stop_t - start_t
                 fps_frame = int(1/inference_time)
@@ -254,21 +254,21 @@ if args.video:
                     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                     cv2.imshow(WINDOW_NAME, frame)
                     cv2.waitKey(int(fps))
-            
+
             if args.output:
                 out = cv2.VideoWriter(
-                    filename=f'{args.output}/{vid}', 
-                    fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
-                    fps=float(fps), 
+                    filename=f'{args.output}/{vid}',
+                    fourcc=cv2.VideoWriter_fourcc(*'mp4v'),
+                    fps=float(fps),
                     frameSize=(width, height),
                     isColor=True,
                 )
-                
+
                 for i in range(len(img_array)):
                     out.write(img_array[i])
                 out.release()
-            
-                           
+
+
     else:
         print('\t|____Video processing: ', args.video)
         video = cv2.VideoCapture(f'{args.video}')
@@ -288,12 +288,12 @@ if args.video:
                 break
 
             small_frame = read_img(frame, np_transforms)
-                                        
+
             if args.trt:
                 prediction = run_model_img(args, small_frame, model_trt)
             else:
                 prediction = run_model_img(args, small_frame, model)
-            
+
             stop_t = time.time()
             inference_time = stop_t - start_t
             fps_frame = int(1/inference_time)
@@ -303,7 +303,7 @@ if args.video:
 
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
-                
+
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                 cv2.imshow(WINDOW_NAME, frame)
@@ -311,13 +311,13 @@ if args.video:
 
         if args.output:
             out = cv2.VideoWriter(
-                filename=f'{args.output}/{args.video.split("/")[-1]}', 
-                fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
-                fps=float(fps), 
+                filename=f'{args.output}/{args.video.split("/")[-1]}',
+                fourcc=cv2.VideoWriter_fourcc(*'mp4v'),
+                fps=float(fps),
                 frameSize=(width, height),
                 isColor=True,
             )
-            
+
             for i in range(len(img_array)):
                 out.write(img_array[i])
             out.release()
@@ -329,19 +329,20 @@ if args.webcam:
         if success:
             start_t = time.time()
             small_frame = read_img(frame, np_transforms)
-            
+
             if args.trt:
                 prediction = run_model_img(args, small_frame, model_trt)
             else:
                 prediction = run_model_img(args, small_frame, model)
-            
+
             stop_t = time.time()
             inference_time = stop_t - start_t
             fps_frame = int(1/inference_time)
             frame = draw_pred(args,frame, prediction,fps_frame)
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, frame)
-            if cv2.waitKey(1) == 27:
+            key = cv2.waitKey(1) & 0xFF
+            if (key == ord('x')):
                 exit()
-            
+
 print('\n[Done]\n')

@@ -51,8 +51,8 @@ def proc_sp(small_frame, np_transforms):
     small_frame = np_transforms(small_frame).float()
     small_frame = small_frame.unsqueeze(0)
     small_frame =  small_frame.to(device)
-    
-    return small_frame 
+
+    return small_frame
 
 ################################################################################
 
@@ -60,9 +60,9 @@ def pil_crop(img):
     sp_pil = Image.fromarray(img)
     imageBox = sp_pil.getbbox()
     sp_crop = sp_pil.crop(imageBox)
-    np_sp_crop = np.array(sp_crop)  
+    np_sp_crop = np.array(sp_crop)
     # sp_crop_cv = cv2.cvtColor(np_sp_crop, cv2.COLOR_RGB2BGR)
-    return np_sp_crop 
+    return np_sp_crop
 
 ################################################################################
 
@@ -78,7 +78,7 @@ def draw_pred(args, frame, contours, prediction):
     if prediction == 1:
         cv2.drawContours(frame, contours, -1, (0,0,255), 1)
     else:
-        cv2.drawContours(frame, contours, -1, (0,255,0), 1)    
+        cv2.drawContours(frame, contours, -1, (0,255,0), 1)
     return frame
 
 ################################################################################
@@ -87,7 +87,7 @@ def process_sp(args, small_frame, np_transforms, model):
     slic = cv2.ximgproc.createSuperpixelSLIC(small_frame, region_size=22)
     slic.iterate(10)
     segments = slic.getLabels()
-    
+
     for (i, segVal) in enumerate(np.unique(segments)):
         mask = np.zeros(small_frame.shape[:2], dtype='uint8')
         mask[segments == segVal] = 255
@@ -100,15 +100,15 @@ def process_sp(args, small_frame, np_transforms, model):
         # contour_list.append(contours)
         superpixel = cv2.bitwise_and(small_frame, small_frame, mask = mask)
         superpixel = cv2.cvtColor(superpixel, cv2.COLOR_BGR2RGB)
-        
+
         #PIL centre crop and data transformation
         # superpixel = pil_crop(superpixel)
         superpixel = proc_sp(superpixel, np_transforms)
 
         # Model prediction
         prediction = run_model_img(args, superpixel, model)
-       
-        # Draw prediction on superpixel 
+
+        # Draw prediction on superpixel
         draw_pred(args, small_frame, contours, prediction)
 
 ################################################################################
@@ -122,7 +122,7 @@ parser.add_argument("--model", default='shufflenetonfire', help="Select the mode
 parser.add_argument("--weight", help="Model weight file path")
 parser.add_argument("--cpu", action="store_true", help="If selected will run on CPU")
 parser.add_argument(
-    "--output", 
+    "--output",
     help="A directory to save output visualizations."
     "If not given , will show output in an OpenCV window."
 )
@@ -183,16 +183,16 @@ if args.image:
         fps = []
         for im in os.listdir(args.image):
             print('\t|____Image processing: ', im)
-            
+
             frame = cv2.imread(f'{args.image}/{im}')
             small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-            
+
             # Prediction on superpixel
             if args.trt:
                 process_sp(args, small_frame, np_transforms, model_trt)
             else:
                 process_sp(args, small_frame, np_transforms, model)
-            
+
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
                 cv2.imwrite(f'{args.output}/{im}', small_frame)
@@ -203,16 +203,16 @@ if args.image:
 
     else:
         print('\t|____Image processing: ', args.image)
-        
+
         frame = cv2.imread(f'{args.image}')
         small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-                
+
         # Prediction on superpixel
         if args.trt:
             process_sp(args, small_frame, np_transforms, model_trt)
         else:
             process_sp(args, small_frame, np_transforms, model)
-        
+
         if args.output:
             os.makedirs(args.output, exist_ok=True)
             cv2.imwrite(f'{args.output}/{args.image.split("/")[-1]}', small_frame)
@@ -242,7 +242,7 @@ if args.video:
                     break
 
                 small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-                                            
+
                 # Prediction on superpixel
                 if args.trt:
                     process_sp(args, small_frame, np_transforms, model_trt)
@@ -256,21 +256,21 @@ if args.video:
                     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                     cv2.imshow(WINDOW_NAME, small_frame)
                     cv2.waitKey(int(fps))
-            
+
             if args.output:
                 out = cv2.VideoWriter(
-                    filename=f'{args.output}/{vid}', 
-                    fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
-                    fps=float(fps), 
+                    filename=f'{args.output}/{vid}',
+                    fourcc=cv2.VideoWriter_fourcc(*'mp4v'),
+                    fps=float(fps),
                     frameSize=(width, height),
                     isColor=True,
                 )
-                
+
                 for i in range(len(img_array)):
                     out.write(img_array[i])
                 out.release()
-            
-                           
+
+
     else:
         print('\t|____Video processing: ', args.video)
         video = cv2.VideoCapture(f'{args.video}')
@@ -289,7 +289,7 @@ if args.video:
                 break
 
             small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-                                            
+
             # Prediction on superpixel
             if args.trt:
                 process_sp(args, small_frame, np_transforms, model_trt)
@@ -299,7 +299,7 @@ if args.video:
 
             if args.output:
                 os.makedirs(args.output, exist_ok=True)
-                
+
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                 cv2.imshow(WINDOW_NAME, small_frame)
@@ -307,13 +307,13 @@ if args.video:
 
         if args.output:
             out = cv2.VideoWriter(
-                filename=f'{args.output}/{args.video.split("/")[-1]}', 
-                fourcc=cv2.VideoWriter_fourcc(*'mp4v'), 
-                fps=float(fps), 
+                filename=f'{args.output}/{args.video.split("/")[-1]}',
+                fourcc=cv2.VideoWriter_fourcc(*'mp4v'),
+                fps=float(fps),
                 frameSize=(width, height),
                 isColor=True,
             )
-            
+
             for i in range(len(img_array)):
                 out.write(img_array[i])
             out.release()
@@ -324,16 +324,17 @@ if args.webcam:
         success, frame = cam.read()
         if success:
             small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-            
+
             # Prediction on superpixel
             if args.trt:
                 process_sp(args, small_frame, np_transforms, model_trt)
             else:
                 process_sp(args, small_frame, np_transforms, model)
-            
+
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, small_frame)
-            if cv2.waitKey(1) == 27:
+            key = cv2.waitKey(1) & 0xFF
+            if (key == ord('x')):
                 exit()
-            
+
 print('\n[Done]\n')
