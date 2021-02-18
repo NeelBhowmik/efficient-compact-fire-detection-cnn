@@ -49,7 +49,7 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
     git clone https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn.git
     ~~~
 
-2. Install [pytorch >= 1.5.0](https://pytorch.org/) with torchvision (that matches the PyTorch installation). Install together from pytorch installation steps for [Jetson Xavier NX](https://forums.developer.nvidia.com/t/pytorch-for-jetson-nano-version-1-6-0-now-available/72048).
+2. Install **pytorch >= 1.5.0** with torchvision (that matches the PyTorch installation - [link](https://pytorch.org/)). For pytorch installation on Xavier NX, please follow the steps from offical [link](https://forums.developer.nvidia.com/t/pytorch-for-jetson-nano-version-1-6-0-now-available/72048).
 
 3. Install the requirements
 
@@ -64,63 +64,66 @@ We support inference for image/image directory, video/video directory, and webca
 1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://doi.org/10.15128/r1tb09j570z)) in ```./weights``` directory. A download script ```download-models.sh``` is also provided which will create an additional ```weights``` directory containing the pre-trained models.
 2. To run {fire, no-fire} classification on **full-frame**:
 
-~~~
-python3 inference_ff.py [-h] [--image IMAGE] [--video VIDEO]
-                             [--webcam] [--trt]
-                             [--model MODEL] [--weight WEIGHT]
-                             [--cpu] [--output OUTPUT]
+    ~~~
+    inference_ff.py [-h]  [--image IMAGE] [--video VIDEO] 
+                          [--webcam] [--camera_to_use CAMERA_TO_USE] 
+                          [--trt] [--model MODEL]
+                          [--weight WEIGHT] [--cpu] [--output OUTPUT] [-fs]
 
-optional arguments:
-  -h, --help       show this help message and exit
-  --image IMAGE    Path to image file or image directory
-  --video VIDEO    Path to video file or video directory
-  --webcam         Take inputs from webcam
-  --trt            Model run on TensorRT
-  --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
-  --weight WEIGHT  Model weight file path
-  --cpu            If selected will run on CPU
-  --output OUTPUT  A directory to save output visualizations.If not given,
-                   will show output in an OpenCV window.
+    optional arguments:
+      -h, --help            show this help message and exit
+      --image IMAGE         Path to image file or image directory
+      --video VIDEO         Path to video file or video directory
+      --webcam              Take inputs from webcam
+      --camera_to_use CAMERA_TO_USE
+                            Specify camera to use for webcam option
+      --trt                 Model run on TensorRT
+      --model MODEL         Select the model {shufflenetonfire, nasnetonfire}
+      --weight WEIGHT       Model weight file path
+      --cpu                 If selected will run on CPU
+      --output OUTPUT       A directory path to save output visualisations.If not
+                            given , will show output in an OpenCV window.
+      -fs, --fullscreen     run in full screen mode
+    ~~~
 
-~~~
+    e.g. as follows ....
 
-e.g. as follows ....
-
-~~~
-
- python3 inference_ff.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
-
-~~~
+    ~~~
+    python3 inference_ff.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
+    ~~~
 
 3. To run {fire, no-fire} **superpixel localisation**:
 
-~~~
-python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO]
-                                     [--webcam] [--trt]
-                                     [--model MODEL] [--weight WEIGHT]
-                                     [--cpu] [--output OUTPUT]
+    ~~~
+    python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO]                               
+                                         [--webcam] [--camera_to_use CAMERA_TO_USE] 
+                                         [--trt] [--model MODEL] 
+                                         [--weight WEIGHT] [--cpu]
+                                         [--output OUTPUT] [-fs]
 
-optional arguments:
-  -h, --help       show this help message and exit
-  --image IMAGE    Path to image file or image directory
-  --video VIDEO    Path to video file or video directory
-  --webcam         Take inputs from webcam
-  --trt            Model run on TensorRT
-  --model MODEL    Select the model {shufflenetonfire, nasnetonfire}
-  --weight WEIGHT  Model weight file path
-  --cpu            If selected will run on CPU
-  --output OUTPUT  A directory to save output visualizations.If not given,
-                   will show output in an OpenCV window.
+    optional arguments:
+      -h, --help            show this help message and exit
+      --image IMAGE         Path to image file or image directory
+      --video VIDEO         Path to video file or video directory
+      --webcam              Take inputs from webcam
+      --camera_to_use CAMERA_TO_USE
+                            Specify camera to use for webcam option
+      --trt                 Model run on TensorRT
+      --model MODEL         Select the model {shufflenetonfire, nasnetonfire}
+      --weight WEIGHT       Model weight file path
+      --cpu                 If selected will run on CPU
+      --output OUTPUT       A directory to save output visualizations.If not given
+                            , will show output in an OpenCV window.
+      -fs, --fullscreen     run in full screen mode
 
-~~~
 
-e.g. as follows ....
+    ~~~
 
-~~~
+    e.g. as follows ....
 
- python3 inference_ff.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
-
-~~~
+    ~~~
+    python3 inference_superpixel.py --video test.mp4 --model shufflenetonfire --weight weights/shufflenet_sp.pt
+    ~~~
 
 ---
 ## Fire Detection Datasets:

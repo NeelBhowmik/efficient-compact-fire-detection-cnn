@@ -49,6 +49,8 @@ def data_transform(model):
 
 ##########################################################################
 
+# read/process superpixel
+
 
 def proc_sp(small_frame, np_transforms):
     # small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
@@ -72,6 +74,8 @@ def pil_crop(img):
 
 ##########################################################################
 
+# model prediction on superpixel
+
 
 def run_model_img(args, frame, model):
     output = model(frame)[0]
@@ -79,6 +83,8 @@ def run_model_img(args, frame, model):
     return pred
 
 ##########################################################################
+
+# drawing prediction on image
 
 
 def draw_pred(args, frame, contours, prediction):
@@ -93,6 +99,7 @@ def draw_pred(args, frame, contours, prediction):
 
 
 def process_sp(args, small_frame, np_transforms, model):
+    # apply SLIC superpixel
     slic = cv2.ximgproc.createSuperpixelSLIC(small_frame, region_size=22)
     slic.iterate(10)
     segments = slic.getLabels()
@@ -116,20 +123,20 @@ def process_sp(args, small_frame, np_transforms, model):
         # superpixel = pil_crop(superpixel)
         superpixel = proc_sp(superpixel, np_transforms)
 
-        # Model prediction
+        # model prediction
         prediction = run_model_img(args, superpixel, model)
 
-        # Draw prediction on superpixel
+        # draw prediction on superpixel
         draw_pred(args, small_frame, contours, prediction)
 
 
 ##########################################################################
 # parse command line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument("--image", 
-    help="Path to image file or image directory")
-parser.add_argument("--video", 
-    help="Path to video file or video directory")
+parser.add_argument("--image",
+                    help="Path to image file or image directory")
+parser.add_argument("--video",
+                    help="Path to video file or video directory")
 parser.add_argument(
     "--webcam",
     action="store_true",
@@ -138,10 +145,10 @@ parser.add_argument(
     "--camera_to_use",
     type=int,
     default=0,
-    help="Specify camera to use for webcam option") 
-parser.add_argument("--trt", 
-    action="store_true", 
-    help="Model run on TensorRT")
+    help="Specify camera to use for webcam option")
+parser.add_argument("--trt",
+                    action="store_true",
+                    help="Model run on TensorRT")
 parser.add_argument(
     "--model",
     default='shufflenetonfire',
@@ -222,14 +229,14 @@ if args.trt:
 # load and process input image directory or image file
 if args.image:
 
-    #list image from a directory or file
+    # list image from a directory or file
     if os.path.isdir(args.image):
         lst_img = os.listdir(args.image)
-        lst_img = [os.path.join(args.image, file) 
-            for file in os.listdir(args.image)]
+        lst_img = [os.path.join(args.image, file)
+                   for file in os.listdir(args.image)]
     if os.path.isfile(args.image):
         lst_img = [args.image]
-   
+
     if args.output:
         os.makedirs(args.output, exist_ok=True)
 
@@ -253,7 +260,7 @@ if args.image:
         if args.output:
             f_name = os.path.basename(im)
             cv2.imwrite(f'{args.output}/{f_name}', small_frame)
-        
+
         # display prdiction if output path is not provided
         # press space key to continue/next
         else:
@@ -276,7 +283,7 @@ if args.video or args.webcam:
         # if not then just use OpenCV default
         print("INFO: camera_stream class not found - camera input may be buffered")
         cap = cv2.VideoCapture()
-    
+
     if args.output:
         os.makedirs(args.output, exist_ok=True)
     else:
@@ -285,8 +292,8 @@ if args.video or args.webcam:
     if args.video:
         if os.path.isdir(args.video):
             lst_vid = os.listdir(args.video)
-            lst_vid = [os.path.join(args.video, file) 
-                for file in os.listdir(args.video)]
+            lst_vid = [os.path.join(args.video, file)
+                       for file in os.listdir(args.video)]
         if os.path.isfile(args.video):
             lst_vid = [args.video]
     if args.webcam:
@@ -299,13 +306,13 @@ if args.video or args.webcam:
             print('\t|____Video processing: ', vid)
         if args.webcam:
             print('\t|____Webcam processing: ')
-        if cap.open(vid):    
+        if cap.open(vid):
             # get video information
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             fps = cap.get(cv2.CAP_PROP_FPS)
-     
-            if args.output:
+
+            if args.output and args.video:
                 f_name = os.path.basename(vid)
                 out = cv2.VideoWriter(
                     filename=f'{args.output}/{f_name}',
@@ -318,7 +325,7 @@ if args.video or args.webcam:
             while (keepProcessing):
                 # start a timer (to see how long processing and display takes)
                 start_tik = cv2.getTickCount()
-        
+
                 # if camera/video file successfully open then read frame
                 if (cap.isOpened):
                     ret, frame = cap.read()
@@ -326,7 +333,7 @@ if args.video or args.webcam:
                     if (ret == 0):
                         keepProcessing = False
                         continue
-    
+
                 small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
 
                 # Prediction on superpixel
@@ -334,99 +341,35 @@ if args.video or args.webcam:
                     process_sp(args, small_frame, np_transforms, model_trt)
                 else:
                     process_sp(args, small_frame, np_transforms, model)
-                
-                small_frame = cv2.resize(small_frame, (width, height), cv2.INTER_AREA)
+
+                small_frame = cv2.resize(
+                    small_frame, (width, height), cv2.INTER_AREA)
 
                 # save prdiction visualisation in output path
                 # only for video input, not for webcam input
-                if args.output:
+                if args.output and args.video:
                     out.write(small_frame)
 
                 # display prdiction if output path is not provided
                 else:
                     cv2.imshow(WINDOW_NAME, small_frame)
                     cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN,
-                                cv2.WINDOW_FULLSCREEN & args.fullscreen)
-                    
+                                          cv2.WINDOW_FULLSCREEN & args.fullscreen)
+
                     stop_tik = ((cv2.getTickCount() - start_tik) /
-                        cv2.getTickFrequency()) * 1000
-                    key = cv2.waitKey(max(2, 40 - int(math.ceil(stop_tik)))) & 0xFF
+                                cv2.getTickFrequency()) * 1000
+                    key = cv2.waitKey(
+                        max(2, 40 - int(math.ceil(stop_tik)))) & 0xFF
 
                     # press "x" for exit  / press "f" for fullscreen
                     if (key == ord('x')):
                         keepProcessing = False
                     elif (key == ord('f')):
                         args.fullscreen = not(args.fullscreen)
-        
-        if args.output:
+
+        if args.output and args.video:
             out.release()
-        else: 
+        else:
             cv2.destroyAllWindows()
-
-#     else:
-#         print('\t|____Video processing: ', args.video)
-#         video = cv2.VideoCapture(f'{args.video}')
-#         keepProcessing = True
-
-#         width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-#         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-#         fps = video.get(cv2.CAP_PROP_FPS)
-#         img_array = []
-
-#         while (keepProcessing):
-#             ret, frame = video.read()
-
-#             if not ret:
-#                 print(f"\t\t... end of video.")
-#                 break
-
-#             small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-
-#             # Prediction on superpixel
-#             if args.trt:
-#                 process_sp(args, small_frame, np_transforms, model_trt)
-#             else:
-#                 process_sp(args, small_frame, np_transforms, model)
-#             img_array.append(small_frame)
-
-#             if args.output:
-#                 os.makedirs(args.output, exist_ok=True)
-
-#             else:
-#                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-#                 cv2.imshow(WINDOW_NAME, small_frame)
-#                 cv2.waitKey(int(fps))
-
-#         if args.output:
-#             out = cv2.VideoWriter(
-#                 filename=f'{args.output}/{args.video.split("/")[-1]}',
-#                 fourcc=cv2.VideoWriter_fourcc(*'mp4v'),
-#                 fps=float(fps),
-#                 frameSize=(width, height),
-#                 isColor=True,
-#             )
-
-#             for i in range(len(img_array)):
-#                 out.write(img_array[i])
-#             out.release()
-# # load and process input webcam
-# if args.webcam:
-#     cam = cv2.VideoCapture(0)
-#     while cam.isOpened():
-#         success, frame = cam.read()
-#         if success:
-#             small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
-
-#             # Prediction on superpixel
-#             if args.trt:
-#                 process_sp(args, small_frame, np_transforms, model_trt)
-#             else:
-#                 process_sp(args, small_frame, np_transforms, model)
-
-#             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-#             cv2.imshow(WINDOW_NAME, small_frame)
-#             key = cv2.waitKey(1) & 0xFF
-#             if (key == ord('x')):
-#                 exit()
 
 print('\n[Done]\n')
