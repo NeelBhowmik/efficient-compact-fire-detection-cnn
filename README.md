@@ -89,7 +89,10 @@ We support inference for image/image directory, video/video directory, and webca
     e.g. as follows ....
 
     ~~~
-    python3 inference_ff.py --video demo/test.mp4 --model shufflenetonfire --weight weights/shufflenet_ff.pt
+    python3 inference_ff.py \
+      --video demo/test.mp4 \
+      --model shufflenetonfire \
+      --weight weights/shufflenet_ff.pt
     ~~~
 
 3. To run {fire, no-fire} **superpixel localisation**:
@@ -122,7 +125,10 @@ We support inference for image/image directory, video/video directory, and webca
     e.g. as follows ....
 
     ~~~
-    python3 inference_superpixel.py --video demo/test.mp4 --model shufflenetonfire --weight weights/shufflenet_sp.pt
+    python3 inference_superpixel.py \
+      --video demo/test.mp4 \
+      --model shufflenetonfire \
+      --weight weights/shufflenet_sp.pt
     ~~~
 
 ---
