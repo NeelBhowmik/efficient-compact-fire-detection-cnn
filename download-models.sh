@@ -13,9 +13,11 @@ echo; echo
 URL=https://collections.durham.ac.uk/downloads/r1tb09j570z
 DIR_LOCAL_TARGET=weights
 
-FILE_NAME=thomson-2020-fire-detection-pretrained-models-pytorch--version1-r1tb09j570z.zip
-DIR_NAME_UNZIPPED=thomson-2020-fire-detection-pretrained-models-pytorch--version1-r1tb09j570z
-MD5_SUM=6511b75be1c36147a94c98587d6bccb6
+#FILE_NAME=thomson-2020-fire-detection-pretrained-models-pytorch--version1-r1tb09j570z.zip
+FILE_NAME=thomson-2020-fire-detection-pretrained-models-pytorch--version2-r1tb09j570z-version3.zip
+DIR_NAME_UNZIPPED=thomson-2020-fire-detection-pretrained-models-pytorch--version2-r1tb09j570z-version3
+MD5_SUM=5c7be76d7f8149be4057849c998ab214
+#MD5_SUM=6511b75be1c36147a94c98587d6bccb6
 
 IDENTIFIER_STRING="ICLMA 2020 Fire Detection CNN (shufflenetonfire / nasnetonfire) models"
 
@@ -63,17 +65,26 @@ echo "Unpacking the compressed file (using $UNCOMPRESS_COMMAND)..."
 
 $UNCOMPRESS_COMMAND $FILE_NAME
 
-# echo "Tidying up..."
+echo "Tidying up..."
 
 W_FILE=weights.zip
+N_DIR_WEIGHT=thomson-2020-fire-detection-pretrained-models-pytorch--version2
 
-$UNCOMPRESS_COMMAND $DIR_NAME_UNZIPPED/$W_FILE
+#$UNCOMPRESS_COMMAND $DIR_NAME_UNZIPPED/$W_FILE
 
-rm $FILE_NAME && rm -r $DIR_NAME_UNZIPPED
-mv $DIR_LOCAL_TARGET/* ./
-rm -r $DIR_LOCAL_TARGET
+#rm $FILE_NAME && rm -r $DIR_NAME_UNZIPPED
+rm $FILE_NAME
+mv $N_DIR_WEIGHT/$DIR_LOCAL_TARGET/* ./
+rm -r $N_DIR_WEIGHT
+
+#Moving test.mp4 file to demo directory
+cd ..
+DEMO_DIR=demo
+mkdir -p $DEMO_DIR
+mv $DIR_LOCAL_TARGET/*.mp4 $DEMO_DIR/
 
 echo "... completed -> required $IDENTIFIER_STRING are now in $DIR_LOCAL_TARGET/"
+echo "... completed -> test video is now in $DEMO_DIR/"
 
 echo "[Done]"
 ################################################################################
