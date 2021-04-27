@@ -158,16 +158,17 @@ or any other associated materials:
 (Thomson, Bhowmik, Breckon), In Proc. International Conference on Machine Learning Applications, IEEE, 2020.
 ```
 @InProceedings{thompson20fire,
-  author =    {Thomson, W. and Bhowmik, N. and Breckon, T.P.},
-  title =     {Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection},
-  booktitle = {Proc. International Conference on Machine Learning Applications},
-  year =      {2020},
-  month =     {December},
+  author = {Thompson, W. and Bhowmik, N. and Breckon, T.P.},
+  title = {Efficient and Compact Convolutional Neural Network Architectures for Non-temporal Real-time Fire Detection},
+  booktitle = {Proc. Int. Conf. Machine Learning Applications},
+  pages = {136-141},
+  year = {2020},
+  month = {December},
   publisher = {IEEE},
+  keywords = {fire detection, CNN, deep-learning real-time, neural architecture search, nas, automl, non-temporal},
   url = {http://breckon.org/toby/publications/papers/thompson20fire.pdf},
+  doi = {10.1109/ICMLA51294.2020.00030},
   arxiv = {http://arxiv.org/abs/2010.08833},
-  note = {to appear},
-  category = {imageclass},
 }
 ```
 
