@@ -61,12 +61,19 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
 ## Instructions to run inference using pre-trained models:
 We support inference for image/image directory, video/video directory, and webcam.
 
-1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://collections.durham.ac.uk/downloads/r1tb09j570z)) in ```./weights``` directory and test video in ```./demo``` directory.  A download script ```download-models.sh``` is also provided which will create an additional ```weights``` directory containing the pre-trained models and ```demo``` directory containing the test video file.
+1. Download pre-trained models ([**nasnetonfire/shufflenetonfire**](https://collections.durham.ac.uk/downloads/r1tb09j570z)) in ```./weights``` directory and test video in ```./demo``` directory as follows:
+
+  ~~~
+  sh ./download-models.sh
+  ~~~
+
+  This download script (```download-models.sh```) will create an additional ```weights``` directory containing the pre-trained models and ```demo``` directory containing a test video file.
+
 2. To run {fire, no-fire} classification on **full-frame**:
 
     ~~~
-    inference_ff.py [-h]  [--image IMAGE] [--video VIDEO] 
-                          [--webcam] [--camera_to_use CAMERA_TO_USE] 
+    inference_ff.py [-h]  [--image IMAGE] [--video VIDEO]
+                          [--webcam] [--camera_to_use CAMERA_TO_USE]
                           [--trt] [--model MODEL]
                           [--weight WEIGHT] [--cpu] [--output OUTPUT] [-fs]
 
@@ -99,8 +106,8 @@ We support inference for image/image directory, video/video directory, and webca
 
     ~~~
     python3 inference_superpixel.py [-h] [--image IMAGE] [--video VIDEO]                               
-                                         [--webcam] [--camera_to_use CAMERA_TO_USE] 
-                                         [--trt] [--model MODEL] 
+                                         [--webcam] [--camera_to_use CAMERA_TO_USE]
+                                         [--trt] [--model MODEL]
                                          [--weight WEIGHT] [--cpu]
                                          [--output OUTPUT] [-fs]
 
