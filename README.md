@@ -38,6 +38,8 @@ The code is tested on Ubuntu 18.04, and Nvidia Jetson Xavier NX using **CPU**/**
     ~~~
     sudo apt update
     sudo apt install python3-dev python3-pip
+    sudo pip3 install -U virtualenv
+    virtualenv --system-site-packages -p python3 ./venv
     ~~~
     And activate the environment.
 
