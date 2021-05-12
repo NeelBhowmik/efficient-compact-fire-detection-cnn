@@ -231,7 +231,6 @@ if args.image:
 
     # list image from a directory or file
     if os.path.isdir(args.image):
-        lst_img = os.listdir(args.image)
         lst_img = [os.path.join(args.image, file)
                    for file in os.listdir(args.image)]
     if os.path.isfile(args.image):
@@ -291,7 +290,6 @@ if args.video or args.webcam:
 
     if args.video:
         if os.path.isdir(args.video):
-            lst_vid = os.listdir(args.video)
             lst_vid = [os.path.join(args.video, file)
                        for file in os.listdir(args.video)]
         if os.path.isfile(args.video):
