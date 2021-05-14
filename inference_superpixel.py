@@ -245,7 +245,7 @@ if args.image:
         print('\t|____Image processing: ', im)
 
         frame = cv2.imread(im)
-        width, height, _ = frame.size()
+        height, width, _ = frame.shape
         small_frame = cv2.resize(frame, (224, 224), cv2.INTER_AREA)
 
         # Prediction on superpixel
